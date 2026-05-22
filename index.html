@@ -11,14 +11,19 @@
         select { padding: 12px; font-size: 18px; width: 420px; background: #333; color: white; border: none; border-radius: 8px; }
         button { padding: 12px 20px; margin: 5px; background: #ffcc00; color: black; border: none; border-radius: 8px; cursor: pointer; }
         .progress-container { margin: 15px 0; background: #333; padding: 8px; border-radius: 10px; }
-        .progress-bar { height: 14px; background: linear-gradient(90deg, #ffcc00, #ff6600); border-radius: 10px; }
+        .progress-bar { height: 14px; background: linear-gradient(90deg, #ffcc00, #ff6600); border-radius: 10px; transition: width 0.3s; }
+        .progress-text { text-align: center; margin-top: 5px; font-weight: bold; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; max-width: 1800px; margin: 0 auto; }
-        .card { background: #222; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.6); }
+        .card { background: #222; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.6); position: relative; }
         .card img { width: 100%; height: 310px; object-fit: contain; background: #111; cursor: zoom-in; }
         .card-info { padding: 12px; text-align: center; }
         .deck-name { color: #ffcc00; font-size: 0.9em; }
         .card-name { font-weight: bold; margin: 6px 0; }
         .search-card-btn { background: #00aa00; color: white; padding: 6px 14px; border: none; border-radius: 6px; cursor: pointer; margin-top: 6px; }
+        .checkbox-container { position: absolute; top: 10px; right: 10px; }
+        .checkbox-input { width: 24px; height: 24px; cursor: pointer; }
+        .card.owned { border: 3px solid #00ff00; }
+        .card.owned::after { content: '✓'; position: absolute; top: 5px; right: 5px; background: #00ff00; color: #000; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
     </style>
 </head>
 <body>
@@ -38,23 +43,23 @@
 
     <script>
         const cards = [
-            { name: "FS08-01_a", code: "FS08-01", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-01_a.jpg" },
-            { name: "FS08-01_b", code: "FS08-01", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-01_b.jpg" },
-            { name: "FS08-02", code: "FS08-02", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-02.jpg" },
-            { name: "FS08-02_p1", code: "FS08-02", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-02_p1.webp" },
-            { name: "FS08-03", code: "FS08-03", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-03.webp" },
-            { name: "FS08-04", code: "FS08-04", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-04.jpg" },
-            { name: "FS08-04_p1", code: "FS08-04", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-04_p1.webp" },
-            { name: "FS08-05", code: "FS08-05", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-05.jpg" },
-            { name: "FS08-06", code: "FS08-06", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-06.jpg" },
-            { name: "FS08-07", code: "FS08-07", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-07.jpg" },
-            { name: "FS08-07_p1", code: "FS08-07", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-07_p1.webp" },
-            { name: "FS08-08", code: "FS08-08", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-08.webp" },
-            { name: "FS08-09", code: "FS08-09", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-09.jpg" },
-            { name: "FS08-09_p1", code: "FS08-09", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-09_p1.webp" },
-            { name: "FS08-10", code: "FS08-10", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-10.jpg" },
-            { name: "FS08-10_p1", code: "FS08-10", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-10_p1.webp" },
-            { name: "FS08-11_p1", code: "FS08-11", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-11_p1.webp" }
+            { name: "FS08-01_a", code: "FS08-01", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-01_a.jpg", owned: false },
+            { name: "FS08-01_b", code: "FS08-01", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-01_b.jpg", owned: false },
+            { name: "FS08-02", code: "FS08-02", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-02.jpg", owned: false },
+            { name: "FS08-02_p1", code: "FS08-02", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-02_p1.webp", owned: false },
+            { name: "FS08-03", code: "FS08-03", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-03.webp", owned: false },
+            { name: "FS08-04", code: "FS08-04", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-04.jpg", owned: false },
+            { name: "FS08-04_p1", code: "FS08-04", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-04_p1.webp", owned: false },
+            { name: "FS08-05", code: "FS08-05", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-05.jpg", owned: false },
+            { name: "FS08-06", code: "FS08-06", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-06.jpg", owned: false },
+            { name: "FS08-07", code: "FS08-07", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-07.jpg", owned: false },
+            { name: "FS08-07_p1", code: "FS08-07", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-07_p1.webp", owned: false },
+            { name: "FS08-08", code: "FS08-08", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-08.webp", owned: false },
+            { name: "FS08-09", code: "FS08-09", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-09.jpg", owned: false },
+            { name: "FS08-09_p1", code: "FS08-09", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-09_p1.webp", owned: false },
+            { name: "FS08-10", code: "FS08-10", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-10.jpg", owned: false },
+            { name: "FS08-10_p1", code: "FS08-10", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-10_p1.webp", owned: false },
+            { name: "FS08-11_p1", code: "FS08-11", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-11_p1.webp", owned: false }
         ];
 
         let currentDeck = "";
@@ -64,6 +69,7 @@
             const select = document.getElementById('deckSelect');
             select.innerHTML = `<option value="">Todos los Mazos</option>`;
             decks.forEach(deck => select.add(new Option(deck, deck)));
+            loadFromLocalStorage();
             renderCurrentDeck();
         }
 
@@ -74,11 +80,15 @@
 
             const filtered = currentDeck ? cards.filter(c => c.deck === currentDeck) : cards;
 
-            filtered.forEach(card => {
+            filtered.forEach((card, index) => {
                 const div = document.createElement('div');
-                div.className = 'card';
+                div.className = 'card' + (card.owned ? ' owned' : '');
+                div.id = 'card-' + card.name;
                 div.innerHTML = `
                     <img src="${card.url}" onclick="mostrarGrande('${card.url}', '${card.name}')">
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox-input" ${card.owned ? 'checked' : ''} onchange="toggleCard('${card.name}', this.checked)">
+                    </div>
                     <div class="card-info">
                         <div class="deck-name">${card.deck}</div>
                         <div class="card-name">${card.name}</div>
@@ -88,6 +98,50 @@
                 `;
                 grid.appendChild(div);
             });
+
+            updateProgress();
+        }
+
+        function toggleCard(cardName, isChecked) {
+            const card = cards.find(c => c.name === cardName);
+            if (card) {
+                card.owned = isChecked;
+                const cardDiv = document.getElementById('card-' + cardName);
+                if (isChecked) {
+                    cardDiv.classList.add('owned');
+                } else {
+                    cardDiv.classList.remove('owned');
+                }
+            }
+            saveToLocalStorage();
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const filtered = currentDeck ? cards.filter(c => c.deck === currentDeck) : cards;
+            const owned = filtered.filter(c => c.owned).length;
+            const total = filtered.length;
+            const percentage = total > 0 ? Math.round((owned / total) * 100) : 0;
+
+            document.getElementById('progressBar').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = `${owned} / ${total} (${percentage}%)`;
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('dbCardGameData', JSON.stringify(cards));
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('dbCardGameData');
+            if (saved) {
+                const savedCards = JSON.parse(saved);
+                savedCards.forEach(savedCard => {
+                    const card = cards.find(c => c.name === savedCard.name);
+                    if (card) {
+                        card.owned = savedCard.owned;
+                    }
+                });
+            }
         }
 
         function buscarCartaOficial(code) {
