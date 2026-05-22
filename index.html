@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DB Card Game - Mi Colección</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #1a1a1a; color: #eee; margin: 0; padding: 20px; }
+        h1 { text-align: center; color: #ffcc00; }
+        .deck-controls { text-align: center; margin: 20px 0; padding: 15px; background: #222; border-radius: 12px; }
+        select { padding: 12px; font-size: 18px; width: 420px; background: #333; color: white; border: none; border-radius: 8px; }
+        button { padding: 12px 20px; margin: 5px; background: #ffcc00; color: black; border: none; border-radius: 8px; cursor: pointer; }
+        .progress-container { margin: 15px 0; background: #333; padding: 8px; border-radius: 10px; }
+        .progress-bar { height: 14px; background: linear-gradient(90deg, #ffcc00, #ff6600); border-radius: 10px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; max-width: 1800px; margin: 0 auto; }
+        .card { background: #222; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.6); }
+        .card img { width: 100%; height: 310px; object-fit: contain; background: #111; cursor: zoom-in; }
+        .card-info { padding: 12px; text-align: center; }
+        .deck-name { color: #ffcc00; font-size: 0.9em; }
+        .card-name { font-weight: bold; margin: 6px 0; }
+    </style>
+</head>
+<body>
+    <h1>📇 DB Card Game - Mi Colección</h1>
+
+    <div class="deck-controls">
+        <select id="deckSelect" onchange="renderCurrentDeck()"></select>
+        <button onclick="buscarMazoCompleto()">🔍 Buscar Mazo en Cardmarket</button>
+    </div>
+
+    <div class="progress-container" id="progressContainer" style="display:none;">
+        <div class="progress-bar" id="progressBar" style="width:0%"></div>
+        <div class="progress-text" id="progressText">0 / 0 (0%)</div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+
+    <script>
+        // ==================== TUS CARTAS ====================
+        const cards = [
+            // Ejemplo - Cambia estos enlaces por los tuyos de ImgBB
+            { name: "Vegeta FS08-01", code: "FS08-01", deck: "Vegeta Mini", url: "https://TU-ENLACE-IMG-BB.com/FS08-01.jpg" },
+            // Añade aquí todas tus cartas...
+        ];
+
+        let currentDeck = "";
+
+        function createDeckSelector() {
+            const decks = [...new Set(cards.map(c => c.deck))].sort();
+            const select = document.getElementById('deckSelect');
+            select.innerHTML = `<option value="">Todos los Mazos</option>`;
+            decks.forEach(deck => select.add(new Option(deck, deck)));
+            renderCurrentDeck();
+        }
+
+        function renderCurrentDeck() {
+            currentDeck = document.getElementById('deckSelect').value;
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+
+            const filtered = currentDeck ? cards.filter(c => c.deck === currentDeck) : cards;
+
+            filtered.forEach(card => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `
+                    <img src="${card.url}" onclick="mostrarGrande('${card.url}', '${card.name}')">
+                    <div class="card-info">
+                        <div class="deck-name">${card.deck}</div>
+                        <div class="card-name">${card.name}</div>
+                        <div class="card-code">Código: <b>${card.code}</b></div>
+                        <button onclick="buscarCartaOficial('${card.code}')" style="background:#00aa00;color:white;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;margin-top:6px;">🌐 Sitio Oficial</button>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function buscarCartaOficial(code) {
+            window.open(`https://www.dbs-cardgame.com/fw/en/cardlist/?search=true&q=${code}`, '_blank');
+        }
+
+        function buscarMazoCompleto() {
+            if (!currentDeck) return alert("Selecciona un mazo primero");
+            const search = encodeURIComponent("STARTER DECK " + currentDeck);
+            window.open(`https://www.cardmarket.com/es/DragonBallSuper/Products/Search?searchString=${search}`, '_blank');
+        }
+
+        function mostrarGrande(src, name) {
+            const modal = document.createElement('div');
+            modal.style = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:10000;display:flex;align-items:center;justify-content:center;";
+            modal.innerHTML = `<img src="${src}" style="max-height:90vh;max-width:90%;border-radius:12px;" onclick="this.parentElement.remove()">`;
+            document.body.appendChild(modal);
+        }
+
+        window.onload = createDeckSelector;
+    </script>
+</body>
+</html>
