@@ -115,15 +115,15 @@
             const card = cards.find(c => c.name === cardName);
             if (card) {
                 card.owned = isChecked;
+                saveToLocalStorage();
                 const cardDiv = document.getElementById('card-' + cardName);
                 if (isChecked) {
                     cardDiv.classList.add('owned');
                 } else {
                     cardDiv.classList.remove('owned');
                 }
+                updateProgress();
             }
-            saveToLocalStorage();
-            updateProgress();
         }
 
         function updateProgress() {
@@ -137,7 +137,8 @@
         }
 
         function saveToLocalStorage() {
-            localStorage.setItem('dbCardGameData', JSON.stringify(cards));
+            const cardsToSave = cards.map(c => ({ name: c.name, owned: c.owned }));
+            localStorage.setItem('dbCardGameData', JSON.stringify(cardsToSave));
         }
 
         function loadFromLocalStorage() {
