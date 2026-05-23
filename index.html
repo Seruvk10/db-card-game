@@ -6,7 +6,8 @@
     <title>DB Card Game - Mi Colección FS08</title>
     <style>
         body { font-family: Arial, sans-serif; background: #1a1a1a; color: #eee; margin: 0; padding: 20px; }
-        h1 { text-align: center; color: #ffcc00; }
+        .logo-container { text-align: center; margin: 20px 0; }
+        .logo-container img { max-width: 100%; height: auto; max-height: 200px; }
         .deck-controls { text-align: center; margin: 20px 0; padding: 15px; background: #222; border-radius: 12px; }
         select { padding: 12px; font-size: 18px; width: 420px; background: #333; color: white; border: none; border-radius: 8px; }
         button { padding: 12px 20px; margin: 5px; background: #ffcc00; color: black; border: none; border-radius: 8px; cursor: pointer; }
@@ -23,11 +24,13 @@
         .checkbox-container { position: absolute; top: 10px; right: 10px; }
         .checkbox-input { width: 24px; height: 24px; cursor: pointer; }
         .card.owned { border: 3px solid #00ff00; }
-        .card.owned::after { content: '✓'; position: absolute; top: 5px; right: 5px; background: #00ff00; color: #000; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
+        .card.owned::after { content: '✓'; position: absolute; top: 5px; right: 5px; background: #00ff00; color: #000; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
     </style>
 </head>
 <body>
-    <h1>📇 DB Card Game - FS08</h1>
+    <div class="logo-container">
+        <img src="https://raw.githubusercontent.com/Seruvk10/db-card-game/main/LOGO.webp" alt="Dragon Ball Super Card Game Logo">
+    </div>
 
     <div class="deck-controls">
         <select id="deckSelect" onchange="renderCurrentDeck()"></select>
