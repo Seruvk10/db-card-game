@@ -42,6 +42,8 @@
     <div class="grid" id="grid"></div>
 
     <script>
+        const baseUrl = "https://raw.githubusercontent.com/Seruvk10/db-card-game/main/";
+        
         const cards = [
             { name: "FS08-01_a", code: "FS08-01", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-01_a.jpg", owned: false },
             { name: "FS08-01_b", code: "FS08-01", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-01_b.jpg", owned: false },
@@ -90,8 +92,9 @@
                 const div = document.createElement('div');
                 div.className = 'card' + (card.owned ? ' owned' : '');
                 div.id = 'card-' + card.name;
+                const imageUrl = baseUrl + card.url;
                 div.innerHTML = `
-                    <img src="${card.url}" onclick="mostrarGrande('${card.url}', '${card.name}')">
+                    <img src="${imageUrl}" onclick="mostrarGrande('${imageUrl}', '${card.name}')">
                     <div class="checkbox-container">
                         <input type="checkbox" class="checkbox-input" ${card.owned ? 'checked' : ''} onchange="toggleCard('${card.name}', this.checked)">
                     </div>
