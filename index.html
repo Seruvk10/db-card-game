@@ -43,23 +43,29 @@
 
     <script>
         const cards = [
-            { name: "FS08-01_a", code: "FS08-01", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-01_a.jpg", owned: false },
-            { name: "FS08-01_b", code: "FS08-01", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-01_b.jpg", owned: false },
-            { name: "FS08-02", code: "FS08-02", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-02.jpg", owned: false },
-            { name: "FS08-02_p1", code: "FS08-02", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-02_p1.webp", owned: false },
-            { name: "FS08-03", code: "FS08-03", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-03.webp", owned: false },
-            { name: "FS08-04", code: "FS08-04", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-04.jpg", owned: false },
-            { name: "FS08-04_p1", code: "FS08-04", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-04_p1.webp", owned: false },
-            { name: "FS08-05", code: "FS08-05", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-05.jpg", owned: false },
-            { name: "FS08-06", code: "FS08-06", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-06.jpg", owned: false },
-            { name: "FS08-07", code: "FS08-07", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-07.jpg", owned: false },
-            { name: "FS08-07_p1", code: "FS08-07", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-07_p1.webp", owned: false },
-            { name: "FS08-08", code: "FS08-08", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-08.webp", owned: false },
-            { name: "FS08-09", code: "FS08-09", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-09.jpg", owned: false },
-            { name: "FS08-09_p1", code: "FS08-09", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-09_p1.webp", owned: false },
-            { name: "FS08-10", code: "FS08-10", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-10.jpg", owned: false },
-            { name: "FS08-10_p1", code: "FS08-10", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-10_p1.webp", owned: false },
-            { name: "FS08-11_p1", code: "FS08-11", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "images/FS08-11_p1.webp", owned: false }
+            { name: "FS08-01_a", code: "FS08-01", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-01_a.jpg", owned: false },
+            { name: "FS08-01_b", code: "FS08-01", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-01_b.jpg", owned: false },
+            { name: "FS08-02", code: "FS08-02", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-02.jpg", owned: false },
+            { name: "FS08-02_p1", code: "FS08-02", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-02_p1.webp", owned: false },
+            { name: "FS08-03", code: "FS08-03", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-03.webp", owned: false },
+            { name: "FS08-04", code: "FS08-04", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-04.jpg", owned: false },
+            { name: "FS08-04_p1", code: "FS08-04", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-04_p1.webp", owned: false },
+            { name: "FS08-05", code: "FS08-05", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-05.jpg", owned: false },
+            { name: "FS08-06", code: "FS08-06", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-06.jpg", owned: false },
+            { name: "FS08-07", code: "FS08-07", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-07.jpg", owned: false },
+            { name: "FS08-07_p1", code: "FS08-07", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-07_p1.webp", owned: false },
+            { name: "FS08-08", code: "FS08-08", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-08.webp", owned: false },
+            { name: "FS08-09", code: "FS08-09", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-09.jpg", owned: false },
+            { name: "FS08-09_p1", code: "FS08-09", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-09_p1.webp", owned: false },
+            { name: "FS08-10", code: "FS08-10", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-10.jpg", owned: false },
+            { name: "FS08-10_p1", code: "FS08-10", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-10_p1.webp", owned: false },
+            { name: "FS08-11_p1", code: "FS08-11", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-11_p1.webp", owned: false },
+            { name: "FS08-12", code: "FS08-12", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-12.jpg", owned: false },
+            { name: "FS08-13", code: "FS08-13", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-13.jpg", owned: false },
+            { name: "FS08-14", code: "FS08-14", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-14.jpg", owned: false },
+            { name: "FS08-15", code: "FS08-15", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-15.jpg", owned: false },
+            { name: "FS08-15_p1", code: "FS08-15", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-15_p1.webp", owned: false },
+            { name: "FS08-16", code: "FS08-16", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-16.jpg", owned: false }
         ];
 
         let currentDeck = "";
