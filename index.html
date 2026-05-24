@@ -13,14 +13,51 @@
         button { padding: 12px 20px; margin: 5px; background: #ffcc00; color: black; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         .progress-container { margin: 15px 0; background: #333; padding: 10px; border-radius: 10px; }
         .progress-bar { height: 14px; border-radius: 10px; transition: width 0.3s; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; max-width: 1800px; margin: 0 auto; }
-        .card { background: #222; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.6); position: relative; }
-        .card img { width: 100%; height: 310px; object-fit: contain; background: #111; cursor: zoom-in; }
+        
+        /* Grid Views */
+        .grid { 
+            display: grid; 
+            gap: 20px; 
+            max-width: 1800px; 
+            margin: 0 auto; 
+            transition: all 0.3s;
+        }
+        .grid.small { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+        .grid.medium { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+        .grid.large { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+        .grid.list { grid-template-columns: 1fr; gap: 12px; }
+
+        .card { 
+            background: #222; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6); 
+            position: relative; 
+            transition: all 0.3s;
+        }
+        .grid.small .card { height: 260px; }
+        .grid.medium .card { height: auto; }
+        .grid.large .card { height: auto; }
+        .grid.list .card { display: flex; align-items: center; padding: 10px; }
+
+        .card img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; 
+            background: #111; 
+            cursor: zoom-in; 
+        }
+        .grid.list .card img { width: 120px; height: 160px; margin-right: 15px; }
+
         .card-info { padding: 12px; text-align: center; }
-        .deck-name { color: #ffcc00; font-size: 0.9em; }
+        .grid.list .card-info { text-align: left; flex: 1; }
+
+        .deck-name { color: #ffcc00; font-size: 0.85em; }
         .card-name { font-weight: bold; margin: 6px 0; }
         .search-card-btn { background: #00aa00; color: white; padding: 6px 14px; border: none; border-radius: 6px; cursor: pointer; margin-top: 6px; }
-        .checkbox-group { display: flex; justify-content: center; gap: 12px; margin: 8px 0; font-size: 0.9em; flex-wrap: wrap; }
+        .checkbox-group { display: flex; justify-content: center; gap: 10px; margin: 8px 0; font-size: 0.85em; flex-wrap: wrap; }
+        .grid.list .checkbox-group { justify-content: flex-start; }
+
         .visit-info { text-align: center; margin: 10px 0; font-size: 0.95em; color: #aaa; }
         .user-panel { background: #222; padding: 15px; border-radius: 10px; margin: 15px 0; text-align: center; }
         .registered-users { margin-top: 30px; background: #1f1f1f; padding: 15px; border-radius: 10px; }
@@ -34,7 +71,6 @@
         <img src="https://raw.githubusercontent.com/Seruvk10/db-card-game/main/LOGO.webp" alt="Dragon Ball Super Card Game Logo">
     </div>
 
-    <!-- Panel de Usuario -->
     <div class="user-panel">
         <h2>🔑 Sistema de Usuarios</h2>
         <input type="text" id="regUsername" placeholder="Nombre de usuario" style="width:220px;">
@@ -50,9 +86,15 @@
 
     <div class="deck-controls">
         <select id="deckSelect" onchange="renderCurrentDeck()"></select>
-        <button onclick="buscarMazoCompleto()">🔍 Buscar Mazo en Cardmarket</button>
+        <select id="viewMode" onchange="changeViewMode()">
+            <option value="medium">🟦 Cuadrícula Mediana</option>
+            <option value="small">🟨 Cuadrícula Pequeña</option>
+            <option value="large">🟩 Cuadrícula Grande</option>
+            <option value="list">📋 Modo Lista</option>
+        </select>
+        <button onclick="buscarMazoCompleto()">🔍 Buscar Mazo</button>
         <button onclick="mostrarMiDeck()">📋 Ver Mi Deck</button>
-        <button onclick="mostrarTodasLasCartas()">🔄 Ver Todas las Cartas</button>
+        <button onclick="mostrarTodasLasCartas()">🔄 Todas las Cartas</button>
         <br>
         <button onclick="marcarTodoDigital()" style="background:#00aaff; color:white;">✅ Todo Digital</button>
         <button onclick="marcarTodoFisico()" style="background:#00ff00; color:black;">✅ Todo Físico</button>
@@ -61,7 +103,6 @@
 
     <div class="visit-info" id="visitInfo"></div>
 
-    <!-- Barras de progreso -->
     <div class="progress-container">
         <div style="color:#00ff00">Física: <span id="physText">0/0 (0%)</span></div>
         <div class="progress-bar" id="physBar" style="background: linear-gradient(90deg, #00ff00, #00cc00); width:0%"></div>
@@ -71,15 +112,12 @@
         <div class="progress-bar" id="digBar" style="background: linear-gradient(90deg, #00aaff, #0088ff); width:0%"></div>
     </div>
 
-    <div class="grid" id="grid"></div>
+    <div class="grid medium" id="grid"></div>
 
-    <!-- Lista de Usuarios Registrados -->
     <div class="registered-users">
         <h3>👥 Usuarios Registrados</h3>
         <table id="usersTable">
-            <thead>
-                <tr><th>Usuario</th><th>Última Actividad</th><th>Estado</th></tr>
-            </thead>
+            <thead><tr><th>Usuario</th><th>Última Actividad</th><th>Estado</th></tr></thead>
             <tbody></tbody>
         </table>
     </div>
@@ -90,8 +128,9 @@
         let currentUser = null;
         let currentDeck = "";
         let currentView = "all";
+        let currentMode = "medium";
 
-        const cards = [
+        const cards = [ /* ... mismo array de cartas que tenías ... */ 
             { name: "FS08-01_a", code: "FS08-01", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-01_a.jpg" },
             { name: "FS08-01_b", code: "FS08-01", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-01_b.jpg" },
             { name: "FS08-02", code: "FS08-02", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-02.jpg" },
@@ -129,23 +168,18 @@
             card.myDeck = false;
         });
 
-        // ==================== USUARIOS ====================
-        function getAllUsers() {
-            return JSON.parse(localStorage.getItem('dbRegisteredUsers') || '[]');
-        }
+        // ==================== USUARIOS Y DEMÁS FUNCIONES (mismo código anterior) ====================
+        // ... (mantengo todo el código de usuarios, save/load, etc.)
 
-        function saveAllUsers(users) {
-            localStorage.setItem('dbRegisteredUsers', JSON.stringify(users));
-        }
+        function getAllUsers() { return JSON.parse(localStorage.getItem('dbRegisteredUsers') || '[]'); }
+        function saveAllUsers(users) { localStorage.setItem('dbRegisteredUsers', JSON.stringify(users)); }
 
         function registrarUsuario() {
             const username = document.getElementById('regUsername').value.trim();
             const password = document.getElementById('regPassword').value.trim();
             if (!username || !password) return alert("❌ Usuario y contraseña son obligatorios");
-
             const users = getAllUsers();
             if (users.find(u => u.username === username)) return alert("❌ Este usuario ya existe");
-
             users.push({ username, password, lastLogin: new Date().toLocaleString('es-ES') });
             saveAllUsers(users);
             actualizarListaUsuarios();
@@ -157,7 +191,6 @@
             const password = document.getElementById('regPassword').value.trim();
             const users = getAllUsers();
             const user = users.find(u => u.username === username && u.password === password);
-
             if (user) {
                 currentUser = username;
                 user.lastLogin = new Date().toLocaleString('es-ES');
@@ -167,9 +200,7 @@
                 renderCurrentDeck();
                 actualizarListaUsuarios();
                 alert(`✅ Bienvenido, ${currentUser}`);
-            } else {
-                alert("❌ Usuario o contraseña incorrectos");
-            }
+            } else alert("❌ Usuario o contraseña incorrectos");
         }
 
         function cerrarSesion() {
@@ -192,53 +223,9 @@
             });
         }
 
-        // ==================== NUEVOS BOTONES ====================
-        function marcarTodoDigital() {
-            if (!currentDeck) return alert("Selecciona un mazo primero");
-            const filtered = cards.filter(c => c.deck === currentDeck);
-            filtered.forEach(card => {
-                card.digital = true;
-                card.physical = false; // opcional: desmarcar físico
-            });
-            saveUserData();
-            renderCurrentDeck();
-            alert("✅ Todo marcado como Digital");
-        }
-
-        function marcarTodoFisico() {
-            if (!currentDeck) return alert("Selecciona un mazo primero");
-            const filtered = cards.filter(c => c.deck === currentDeck);
-            filtered.forEach(card => {
-                card.physical = true;
-                card.digital = false; // opcional: desmarcar digital
-            });
-            saveUserData();
-            renderCurrentDeck();
-            alert("✅ Todo marcado como Físico");
-        }
-
-        function desmarcarTodo() {
-            if (!currentDeck) return alert("Selecciona un mazo primero");
-            const filtered = cards.filter(c => c.deck === currentDeck);
-            filtered.forEach(card => {
-                card.physical = false;
-                card.digital = false;
-                card.myDeck = false;
-            });
-            saveUserData();
-            renderCurrentDeck();
-            alert("❌ Todo desmarcado");
-        }
-
-        // ==================== GUARDADO ====================
         function saveUserData() {
             if (!currentUser) return;
-            const data = cards.map(c => ({
-                name: c.name,
-                physical: c.physical,
-                digital: c.digital,
-                myDeck: c.myDeck
-            }));
+            const data = cards.map(c => ({ name: c.name, physical: c.physical, digital: c.digital, myDeck: c.myDeck }));
             localStorage.setItem(`dbCards_${currentUser}`, JSON.stringify(data));
         }
 
@@ -256,6 +243,40 @@
                     }
                 });
             }
+        }
+
+        // ==================== NUEVO: CAMBIO DE VISTA ====================
+        function changeViewMode() {
+            currentMode = document.getElementById('viewMode').value;
+            const gridElement = document.getElementById('grid');
+            gridElement.className = `grid ${currentMode}`;
+            renderCurrentDeck(); // Re-render para ajustar
+        }
+
+        // ==================== MARCAR TODO ====================
+        function marcarTodoDigital() {
+            if (!currentDeck) return alert("Selecciona un mazo primero");
+            cards.filter(c => c.deck === currentDeck).forEach(c => { c.digital = true; c.physical = false; });
+            saveUserData();
+            renderCurrentDeck();
+        }
+
+        function marcarTodoFisico() {
+            if (!currentDeck) return alert("Selecciona un mazo primero");
+            cards.filter(c => c.deck === currentDeck).forEach(c => { c.physical = true; c.digital = false; });
+            saveUserData();
+            renderCurrentDeck();
+        }
+
+        function desmarcarTodo() {
+            if (!currentDeck) return alert("Selecciona un mazo primero");
+            cards.filter(c => c.deck === currentDeck).forEach(c => { 
+                c.physical = false; 
+                c.digital = false; 
+                c.myDeck = false; 
+            });
+            saveUserData();
+            renderCurrentDeck();
         }
 
         // ==================== RENDER ====================
@@ -343,21 +364,15 @@
             document.body.appendChild(modal);
         }
 
-        function incrementarVisitas() {
-            let visitas = parseInt(localStorage.getItem('dbTotalVisits') || '0') + 1;
-            localStorage.setItem('dbTotalVisits', visitas);
-            return visitas;
-        }
-
         window.onload = () => {
             createDeckSelector();
             if (currentUser) loadUserData();
             renderCurrentDeck();
             actualizarListaUsuarios();
 
-            const visitas = incrementarVisitas();
-            document.getElementById('visitInfo').innerHTML = 
-                `📈 Visitas totales: <b>${visitas}</b> | 👤 Usuario: <b>${currentUser || 'Invitado'}</b>`;
+            const visitas = (parseInt(localStorage.getItem('dbTotalVisits') || '0') + 1);
+            localStorage.setItem('dbTotalVisits', visitas);
+            document.getElementById('visitInfo').innerHTML = `📈 Visitas: <b>${visitas}</b> | 👤 ${currentUser || 'Invitado'}`;
         };
     </script>
 </body>
