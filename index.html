@@ -163,10 +163,21 @@
         }
 
         function buscarMazoCompleto() {
-            if (!currentDeck) return alert("Selecciona un mazo primero");
-            const search = encodeURIComponent("STARTER DECK " + currentDeck);
-            window.open(`https://www.cardmarket.com/es/DragonBallSuper/Products/Search?searchString=${search}`, '_blank');
-        }
+    if (!currentDeck) {
+        return alert("❌ Selecciona un mazo primero");
+    }
+
+    const deckName = currentDeck.trim();
+    
+    // Codificamos el nombre completo del mazo para la búsqueda
+    const searchString = encodeURIComponent(
+        "STARTER DECK " + deckName
+    );
+
+    const url = `https://www.cardmarket.com/es/DragonBallSuper/Products/Search?searchMode=v2&idCategory=0&idExpansion=0&searchString=${searchString}&idRarity=0&perSite=30`;
+
+    window.open(url, '_blank');
+}
 
         function mostrarGrande(src, name) {
             const modal = document.createElement('div');
