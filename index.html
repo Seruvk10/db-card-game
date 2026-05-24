@@ -9,11 +9,10 @@
         .logo-container { text-align: center; margin: 20px 0; }
         .logo-container img { max-width: 100%; height: auto; max-height: 200px; }
         .deck-controls { text-align: center; margin: 20px 0; padding: 15px; background: #222; border-radius: 12px; }
-        select, input { padding: 12px; font-size: 18px; background: #333; color: white; border: none; border-radius: 8px; margin: 5px; }
-        button { padding: 12px 20px; margin: 5px; background: #ffcc00; color: black; border: none; border-radius: 8px; cursor: pointer; }
+        input, select { padding: 12px; font-size: 16px; background: #333; color: white; border: none; border-radius: 8px; margin: 5px; }
+        button { padding: 12px 20px; margin: 5px; background: #ffcc00; color: black; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         .progress-container { margin: 15px 0; background: #333; padding: 10px; border-radius: 10px; }
         .progress-bar { height: 14px; border-radius: 10px; transition: width 0.3s; }
-        .progress-text { text-align: center; margin-top: 5px; font-weight: bold; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; max-width: 1800px; margin: 0 auto; }
         .card { background: #222; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.6); position: relative; }
         .card img { width: 100%; height: 310px; object-fit: contain; background: #111; cursor: zoom-in; }
@@ -22,7 +21,12 @@
         .card-name { font-weight: bold; margin: 6px 0; }
         .search-card-btn { background: #00aa00; color: white; padding: 6px 14px; border: none; border-radius: 6px; cursor: pointer; margin-top: 6px; }
         .checkbox-group { display: flex; justify-content: center; gap: 12px; margin: 8px 0; font-size: 0.9em; flex-wrap: wrap; }
-        .visit-info { text-align: center; margin: 10px 0; font-size: 0.9em; color: #aaa; }
+        .visit-info { text-align: center; margin: 10px 0; font-size: 0.95em; color: #aaa; }
+        .user-panel { background: #222; padding: 15px; border-radius: 10px; margin: 15px 0; text-align: center; }
+        .registered-users { margin-top: 30px; background: #1f1f1f; padding: 15px; border-radius: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #444; }
+        .active { color: #00ff00; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -30,10 +34,21 @@
         <img src="https://raw.githubusercontent.com/Seruvk10/db-card-game/main/LOGO.webp" alt="Dragon Ball Super Card Game Logo">
     </div>
 
+    <!-- Panel de Usuario -->
+    <div class="user-panel">
+        <h2>🔑 Sistema de Usuarios</h2>
+        <input type="text" id="regUsername" placeholder="Nombre de usuario" style="width:220px;">
+        <input type="password" id="regPassword" placeholder="Contraseña" style="width:220px;">
+        <br>
+        <button onclick="registrarUsuario()">📝 Registrar</button>
+        <button onclick="iniciarSesion()">🔓 Iniciar Sesión</button>
+        <button onclick="cerrarSesion()">🚪 Cerrar Sesión</button>
+        <p id="currentUserDisplay" style="margin-top:10px; font-weight:bold;">
+            Usuario actual: <span style="color:#ffcc00;">Invitado</span>
+        </p>
+    </div>
+
     <div class="deck-controls">
-        <input type="text" id="username" placeholder="Tu nombre de usuario" style="width:220px;">
-        <button onclick="crearOSeleccionarUsuario()">Cambiar/Guardar Usuario</button>
-        <br><br>
         <select id="deckSelect" onchange="renderCurrentDeck()"></select>
         <button onclick="buscarMazoCompleto()">🔍 Buscar Mazo en Cardmarket</button>
         <button onclick="mostrarMiDeck()">📋 Ver Mi Deck</button>
@@ -42,7 +57,7 @@
 
     <div class="visit-info" id="visitInfo"></div>
 
-    <!-- Progresos -->
+    <!-- Barras de progreso -->
     <div class="progress-container">
         <div style="color:#00ff00">Física: <span id="physText">0/0 (0%)</span></div>
         <div class="progress-bar" id="physBar" style="background: linear-gradient(90deg, #00ff00, #00cc00); width:0%"></div>
@@ -54,63 +69,148 @@
 
     <div class="grid" id="grid"></div>
 
+    <!-- Lista de Usuarios Registrados -->
+    <div class="registered-users">
+        <h3>👥 Usuarios Registrados</h3>
+        <table id="usersTable">
+            <thead>
+                <tr><th>Usuario</th><th>Última Actividad</th><th>Estado</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
     <script>
         const baseUrl = "https://raw.githubusercontent.com/Seruvk10/db-card-game/main/";
         
-        let currentUser = "Invitado";
+        let currentUser = null;
         let currentDeck = "";
-        let currentView = "all"; // "all" o "mydeck"
+        let currentView = "all";
 
         const cards = [
-            { name: "FS08-01_a", code: "FS08-01", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-01_a.jpg", owned: false },
-            { name: "FS08-01_b", code: "FS08-01", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-01_b.jpg", owned: false },
-            { name: "FS08-02", code: "FS08-02", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-02.jpg", owned: false },
-            { name: "FS08-02_p1", code: "FS08-02", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-02_p1.webp", owned: false },
-            { name: "FS08-03", code: "FS08-03", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-03.webp", owned: false },
-            { name: "FS08-04", code: "FS08-04", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-04.jpg", owned: false },
-            { name: "FS08-04_p1", code: "FS08-04", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-04_p1.webp", owned: false },
-            { name: "FS08-05", code: "FS08-05", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-05.jpg", owned: false },
-            { name: "FS08-06", code: "FS08-06", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-06.jpg", owned: false },
-            { name: "FS08-07", code: "FS08-07", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-07.jpg", owned: false },
-            { name: "FS08-07_p1", code: "FS08-07", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-07_p1.webp", owned: false },
-            { name: "FS08-08", code: "FS08-08", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-08.webp", owned: false },
-            { name: "FS08-09", code: "FS08-09", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-09.jpg", owned: false },
-            { name: "FS08-09_p1", code: "FS08-09", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-09_p1.webp", owned: false },
-            { name: "FS08-10", code: "FS08-10", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-10.jpg", owned: false },
-            { name: "FS08-10_p1", code: "FS08-10", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-10_p1.webp", owned: false },
-            { name: "FS08-11", code: "FS08-11", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-11.jpg", owned: false },
-            { name: "FS08-11_p1", code: "FS08-11", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-11_p1.webp", owned: false },
-            { name: "FS08-12", code: "FS08-12", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-12.jpg", owned: false },
-            { name: "FS08-13", code: "FS08-13", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-13.jpg", owned: false },
-            { name: "FS08-14", code: "FS08-14", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-14.jpg", owned: false },
-            { name: "FS08-15", code: "FS08-15", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-15.jpg", owned: false },
-            { name: "FS08-15_p1", code: "FS08-15", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-15_p1.webp", owned: false },
-            { name: "FS08-16", code: "FS08-16", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-16.jpg", owned: false },
-            { name: "FB09-001", code: "FB09-001", deck: "BOOSTER PACK -DUAL EVOLUTION- [FB09]", url: "FB09-001_a1.jpg", owned: false },
-            { name: "FB09-001", code: "FB09-001", deck: "BOOSTER PACK -DUAL EVOLUTION- [FB09]", url: "FB09-001_a2.jpg", owned: false },
-            { name: "FB09-001", code: "FB09-001", deck: "BOOSTER PACK -DUAL EVOLUTION- [FB09]", url: "FB09-001_b1.jpg", owned: false },
-            { name: "FB09-001", code: "FB09-001", deck: "BOOSTER PACK -DUAL EVOLUTION- [FB09]", url: "FB09-001_b2.jpg", owned: false },
-            { name: "FB09-001", code: "FB09-001", deck: "BOOSTER PACK -DUAL EVOLUTION- [FB09]", url: "FB09-001_c2.jpg", owned: false }
+            { name: "FS08-01_a", code: "FS08-01", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-01_a.jpg" },
+            { name: "FS08-01_b", code: "FS08-01", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-01_b.jpg" },
+            { name: "FS08-02", code: "FS08-02", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-02.jpg" },
+            { name: "FS08-02_p1", code: "FS08-02", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-02_p1.webp" },
+            { name: "FS08-03", code: "FS08-03", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-03.webp" },
+            { name: "FS08-04", code: "FS08-04", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-04.jpg" },
+            { name: "FS08-04_p1", code: "FS08-04", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-04_p1.webp" },
+            { name: "FS08-05", code: "FS08-05", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-05.jpg" },
+            { name: "FS08-06", code: "FS08-06", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-06.jpg" },
+            { name: "FS08-07", code: "FS08-07", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-07.jpg" },
+            { name: "FS08-07_p1", code: "FS08-07", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-07_p1.webp" },
+            { name: "FS08-08", code: "FS08-08", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-08.webp" },
+            { name: "FS08-09", code: "FS08-09", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-09.jpg" },
+            { name: "FS08-09_p1", code: "FS08-09", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-09_p1.webp" },
+            { name: "FS08-10", code: "FS08-10", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-10.jpg" },
+            { name: "FS08-10_p1", code: "FS08-10", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-10_p1.webp" },
+            { name: "FS08-11", code: "FS08-11", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-11.jpg" },
+            { name: "FS08-11_p1", code: "FS08-11", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-11_p1.webp" },
+            { name: "FS08-12", code: "FS08-12", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-12.jpg" },
+            { name: "FS08-13", code: "FS08-13", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-13.jpg" },
+            { name: "FS08-14", code: "FS08-14", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-14.jpg" },
+            { name: "FS08-15", code: "FS08-15", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-15.jpg" },
+            { name: "FS08-15_p1", code: "FS08-15", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-15_p1.webp" },
+            { name: "FS08-16", code: "FS08-16", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-16.jpg" },
+            { name: "FB09-001", code: "FB09-001", deck: "BOOSTER PACK -DUAL EVOLUTION- [FB09]", url: "FB09-001_a1.jpg" },
+            { name: "FB09-001", code: "FB09-001", deck: "BOOSTER PACK -DUAL EVOLUTION- [FB09]", url: "FB09-001_a2.jpg" },
+            { name: "FB09-001", code: "FB09-001", deck: "BOOSTER PACK -DUAL EVOLUTION- [FB09]", url: "FB09-001_b1.jpg" },
+            { name: "FB09-001", code: "FB09-001", deck: "BOOSTER PACK -DUAL EVOLUTION- [FB09]", url: "FB09-001_b2.jpg" },
+            { name: "FB09-001", code: "FB09-001", deck: "BOOSTER PACK -DUAL EVOLUTION- [FB09]", url: "FB09-001_c2.jpg" }
         ];
 
-        // Inicializar propiedades
+        // Inicializar propiedades de cada carta
         cards.forEach(card => {
             card.physical = false;
             card.digital = false;
             card.myDeck = false;
         });
 
-        function crearOSeleccionarUsuario() {
-            const name = document.getElementById('username').value.trim();
-            if (name) {
-                currentUser = name;
+        // ==================== SISTEMA DE USUARIOS ====================
+        function getAllUsers() {
+            return JSON.parse(localStorage.getItem('dbRegisteredUsers') || '[]');
+        }
+
+        function saveAllUsers(users) {
+            localStorage.setItem('dbRegisteredUsers', JSON.stringify(users));
+        }
+
+        function registrarUsuario() {
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value.trim();
+
+            if (!username || !password) return alert("❌ Usuario y contraseña son obligatorios");
+
+            const users = getAllUsers();
+            if (users.find(u => u.username === username)) {
+                return alert("❌ Este usuario ya existe");
+            }
+
+            users.push({
+                username: username,
+                password: password,
+                lastLogin: new Date().toLocaleString('es-ES')
+            });
+            saveAllUsers(users);
+            actualizarListaUsuarios();
+            alert(`✅ Usuario "${username}" registrado correctamente`);
+        }
+
+        function iniciarSesion() {
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value.trim();
+
+            const users = getAllUsers();
+            const user = users.find(u => u.username === username && u.password === password);
+
+            if (user) {
+                currentUser = username;
+                user.lastLogin = new Date().toLocaleString('es-ES');
+                saveAllUsers(users);
+                
+                document.getElementById('currentUserDisplay').innerHTML = 
+                    `Usuario actual: <span style="color:#ffcc00;">${currentUser}</span>`;
+                
                 loadUserData();
                 renderCurrentDeck();
-                alert(`Usuario cambiado a: ${currentUser}`);
+                actualizarListaUsuarios();
+                alert(`✅ Bienvenido, ${currentUser}`);
+            } else {
+                alert("❌ Usuario o contraseña incorrectos");
             }
         }
 
+        function cerrarSesion() {
+            if (confirm("¿Cerrar sesión actual?")) {
+                currentUser = null;
+                document.getElementById('currentUserDisplay').innerHTML = 
+                    `Usuario actual: <span style="color:#ffcc00;">Invitado</span>`;
+                renderCurrentDeck();
+            }
+        }
+
+        function actualizarListaUsuarios() {
+            const users = getAllUsers();
+            const tbody = document.querySelector('#usersTable tbody');
+            tbody.innerHTML = '';
+
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                const lastDate = new Date(user.lastLogin);
+                const isActive = (Date.now() - lastDate.getTime()) < 86400000; // 24 horas
+
+                row.innerHTML = `
+                    <td><b>${user.username}</b></td>
+                    <td>${user.lastLogin}</td>
+                    <td class="${isActive ? 'active' : ''}">${isActive ? '🟢 Activo' : '⚪ Inactivo'}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // ==================== GUARDADO DE COLECCIÓN ====================
         function saveUserData() {
+            if (!currentUser) return;
             const data = cards.map(c => ({
                 name: c.name,
                 physical: c.physical,
@@ -121,6 +221,7 @@
         }
 
         function loadUserData() {
+            if (!currentUser) return;
             const saved = localStorage.getItem(`dbCards_${currentUser}`);
             if (saved) {
                 const savedCards = JSON.parse(saved);
@@ -135,6 +236,7 @@
             }
         }
 
+        // ==================== RENDER ====================
         function renderCurrentDeck() {
             currentDeck = document.getElementById('deckSelect').value;
             const grid = document.getElementById('grid');
@@ -233,22 +335,22 @@
             document.body.appendChild(modal);
         }
 
-        async function loadVisitInfo() {
-            try {
-                const res = await fetch('https://ipapi.co/json/');
-                const data = await res.json();
-                document.getElementById('visitInfo').innerHTML = 
-                    `👤 Usuario: <b>${currentUser}</b> | 🌍 ${data.country_name || 'Desconocido'}`;
-            } catch(e) {
-                document.getElementById('visitInfo').textContent = `👤 Usuario: ${currentUser}`;
-            }
+        // Contador de visitas
+        function incrementarVisitas() {
+            let visitas = parseInt(localStorage.getItem('dbTotalVisits') || '0') + 1;
+            localStorage.setItem('dbTotalVisits', visitas);
+            return visitas;
         }
 
         window.onload = () => {
             createDeckSelector();
-            loadUserData();
+            if (currentUser) loadUserData();
             renderCurrentDeck();
-            loadVisitInfo();
+            actualizarListaUsuarios();
+
+            const visitas = incrementarVisitas();
+            document.getElementById('visitInfo').innerHTML = 
+                `📈 Visitas totales: <b>${visitas}</b> | 👤 Usuario: <b>${currentUser || 'Invitado'}</b>`;
         };
     </script>
 </body>
