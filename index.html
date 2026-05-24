@@ -24,29 +24,42 @@
         .checkbox-container { position: absolute; top: 10px; right: 10px; }
         .checkbox-input { width: 24px; height: 24px; cursor: pointer; }
         .card.owned { border: 3px solid #00ff00; }
-        .card.owned::after { content: '✓'; position: absolute; top: 5px; left: 5px; background: #00ff00; color: #000; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .card.owned::after { 
+            content: '✓'; 
+            position: absolute; 
+            top: 8px; 
+            left: 8px; 
+            background: #00ff00; 
+            color: #000; 
+            width: 26px; 
+            height: 26px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+        }
     </style>
 </head>
 <body>
     <div class="logo-container">
         <img src="https://raw.githubusercontent.com/Seruvk10/db-card-game/main/LOGO.webp" alt="Dragon Ball Super Card Game Logo">
     </div>
-
     <div class="deck-controls">
         <select id="deckSelect" onchange="renderCurrentDeck()"></select>
         <button onclick="buscarMazoCompleto()">🔍 Buscar Mazo Completo en Cardmarket</button>
     </div>
-
     <div class="progress-container" id="progressContainer">
         <div class="progress-bar" id="progressBar" style="width:0%"></div>
         <div class="progress-text" id="progressText">0 / 0 (0%)</div>
     </div>
-
     <div class="grid" id="grid"></div>
 
     <script>
         const baseUrl = "https://raw.githubusercontent.com/Seruvk10/db-card-game/main/";
-        
+       
         const cards = [
             { name: "FS08-01_a", code: "FS08-01", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-01_a.jpg", owned: false },
             { name: "FS08-01_b", code: "FS08-01", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-01_b.jpg", owned: false },
@@ -71,10 +84,10 @@
             { name: "FS08-14", code: "FS08-14", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-14.jpg", owned: false },
             { name: "FS08-15", code: "FS08-15", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-15.jpg", owned: false },
             { name: "FS08-15_p1", code: "FS08-15", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-15_p1.webp", owned: false },
-            { name: "FS08-16", code: "FS08-16", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-16.jpg", owned: false }
-
-            { name: "FB09-001", code: "FS08-16", deck: "BOOSTER PACK -DUAL EVOLUTION- [FB09]", url: "FB09-001_b.jpg", owned: false }
-            { name: "FB09-001", code: "FS08-16", deck: "BOOSTER PACK -DUAL EVOLUTION- [FB09]", url: "FB09-001_b_p1.jpg", owned: false }
+            { name: "FS08-16", code: "FS08-16", deck: "STARTER DECK -VEGETA(MINI) SUPER SAIYAN 3- [FS08]", url: "FS08-16.jpg", owned: false },
+            // Nuevas cartas del booster
+            { name: "FB09-001", code: "FB09-001", deck: "BOOSTER PACK -DUAL EVOLUTION- [FB09]", url: "FB09-001_b.jpg", owned: false },
+            { name: "FB09-001", code: "FB09-001", deck: "BOOSTER PACK -DUAL EVOLUTION- [FB09]", url: "FB09-001_b_p1.jpg", owned: false }
         ];
 
         let currentDeck = "";
@@ -92,10 +105,8 @@
             currentDeck = document.getElementById('deckSelect').value;
             const grid = document.getElementById('grid');
             grid.innerHTML = '';
-
             const filtered = currentDeck ? cards.filter(c => c.deck === currentDeck) : cards;
-
-            filtered.forEach((card, index) => {
+            filtered.forEach((card) => {
                 const div = document.createElement('div');
                 div.className = 'card' + (card.owned ? ' owned' : '');
                 div.id = 'card-' + card.name;
@@ -114,7 +125,6 @@
                 `;
                 grid.appendChild(div);
             });
-
             updateProgress();
         }
 
@@ -124,11 +134,8 @@
                 card.owned = isChecked;
                 saveToLocalStorage();
                 const cardDiv = document.getElementById('card-' + cardName);
-                if (isChecked) {
-                    cardDiv.classList.add('owned');
-                } else {
-                    cardDiv.classList.remove('owned');
-                }
+                if (isChecked) cardDiv.classList.add('owned');
+                else cardDiv.classList.remove('owned');
                 updateProgress();
             }
         }
@@ -138,7 +145,6 @@
             const owned = filtered.filter(c => c.owned).length;
             const total = filtered.length;
             const percentage = total > 0 ? Math.round((owned / total) * 100) : 0;
-
             document.getElementById('progressBar').style.width = percentage + '%';
             document.getElementById('progressText').textContent = `${owned} / ${total} (${percentage}%)`;
         }
@@ -154,9 +160,7 @@
                 const savedCards = JSON.parse(saved);
                 savedCards.forEach(savedCard => {
                     const card = cards.find(c => c.name === savedCard.name);
-                    if (card) {
-                        card.owned = savedCard.owned;
-                    }
+                    if (card) card.owned = savedCard.owned;
                 });
             }
         }
@@ -166,17 +170,14 @@
         }
 
         function buscarMazoCompleto() {
-    if (!currentDeck) {
-        return alert("❌ Selecciona un mazo primero");
-    }
+            if (!currentDeck) {
+                return alert("❌ Selecciona un mazo primero");
+            }
 
-    // Usamos el nombre completo tal como está, sin duplicar
-    let searchText = currentDeck.trim();
-    
-    const url = `https://www.cardmarket.com/es/DragonBallSuper/Products/Search?searchMode=v2&idCategory=0&idExpansion=0&searchString=${encodeURIComponent(searchText)}&idRarity=0&perSite=30`;
-
-    window.open(url, '_blank');
-}
+            let searchText = currentDeck.trim();
+            const url = `https://www.cardmarket.com/es/DragonBallSuper/Products/Search?searchMode=v2&idCategory=0&idExpansion=0&searchString=${encodeURIComponent(searchText)}&idRarity=0&perSite=30`;
+            window.open(url, '_blank');
+        }
 
         function mostrarGrande(src, name) {
             const modal = document.createElement('div');
