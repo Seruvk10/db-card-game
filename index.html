@@ -53,6 +53,10 @@
         <button onclick="buscarMazoCompleto()">🔍 Buscar Mazo en Cardmarket</button>
         <button onclick="mostrarMiDeck()">📋 Ver Mi Deck</button>
         <button onclick="mostrarTodasLasCartas()">🔄 Ver Todas las Cartas</button>
+        <br>
+        <button onclick="marcarTodoDigital()" style="background:#00aaff; color:white;">✅ Todo Digital</button>
+        <button onclick="marcarTodoFisico()" style="background:#00ff00; color:black;">✅ Todo Físico</button>
+        <button onclick="desmarcarTodo()" style="background:#ff4444; color:white;">❌ Desmarcar Todo</button>
     </div>
 
     <div class="visit-info" id="visitInfo"></div>
@@ -119,14 +123,13 @@
             { name: "FB09-001", code: "FB09-001", deck: "BOOSTER PACK -DUAL EVOLUTION- [FB09]", url: "FB09-001_c2.jpg" }
         ];
 
-        // Inicializar propiedades de cada carta
         cards.forEach(card => {
             card.physical = false;
             card.digital = false;
             card.myDeck = false;
         });
 
-        // ==================== SISTEMA DE USUARIOS ====================
+        // ==================== USUARIOS ====================
         function getAllUsers() {
             return JSON.parse(localStorage.getItem('dbRegisteredUsers') || '[]');
         }
@@ -138,28 +141,20 @@
         function registrarUsuario() {
             const username = document.getElementById('regUsername').value.trim();
             const password = document.getElementById('regPassword').value.trim();
-
             if (!username || !password) return alert("❌ Usuario y contraseña son obligatorios");
 
             const users = getAllUsers();
-            if (users.find(u => u.username === username)) {
-                return alert("❌ Este usuario ya existe");
-            }
+            if (users.find(u => u.username === username)) return alert("❌ Este usuario ya existe");
 
-            users.push({
-                username: username,
-                password: password,
-                lastLogin: new Date().toLocaleString('es-ES')
-            });
+            users.push({ username, password, lastLogin: new Date().toLocaleString('es-ES') });
             saveAllUsers(users);
             actualizarListaUsuarios();
-            alert(`✅ Usuario "${username}" registrado correctamente`);
+            alert(`✅ Usuario "${username}" registrado`);
         }
 
         function iniciarSesion() {
             const username = document.getElementById('regUsername').value.trim();
             const password = document.getElementById('regPassword').value.trim();
-
             const users = getAllUsers();
             const user = users.find(u => u.username === username && u.password === password);
 
@@ -167,10 +162,7 @@
                 currentUser = username;
                 user.lastLogin = new Date().toLocaleString('es-ES');
                 saveAllUsers(users);
-                
-                document.getElementById('currentUserDisplay').innerHTML = 
-                    `Usuario actual: <span style="color:#ffcc00;">${currentUser}</span>`;
-                
+                document.getElementById('currentUserDisplay').innerHTML = `Usuario actual: <span style="color:#ffcc00;">${currentUser}</span>`;
                 loadUserData();
                 renderCurrentDeck();
                 actualizarListaUsuarios();
@@ -181,10 +173,9 @@
         }
 
         function cerrarSesion() {
-            if (confirm("¿Cerrar sesión actual?")) {
+            if (confirm("¿Cerrar sesión?")) {
                 currentUser = null;
-                document.getElementById('currentUserDisplay').innerHTML = 
-                    `Usuario actual: <span style="color:#ffcc00;">Invitado</span>`;
+                document.getElementById('currentUserDisplay').innerHTML = `Usuario actual: <span style="color:#ffcc00;">Invitado</span>`;
                 renderCurrentDeck();
             }
         }
@@ -193,22 +184,53 @@
             const users = getAllUsers();
             const tbody = document.querySelector('#usersTable tbody');
             tbody.innerHTML = '';
-
             users.forEach(user => {
+                const isActive = (Date.now() - new Date(user.lastLogin).getTime()) < 86400000;
                 const row = document.createElement('tr');
-                const lastDate = new Date(user.lastLogin);
-                const isActive = (Date.now() - lastDate.getTime()) < 86400000; // 24 horas
-
-                row.innerHTML = `
-                    <td><b>${user.username}</b></td>
-                    <td>${user.lastLogin}</td>
-                    <td class="${isActive ? 'active' : ''}">${isActive ? '🟢 Activo' : '⚪ Inactivo'}</td>
-                `;
+                row.innerHTML = `<td><b>${user.username}</b></td><td>${user.lastLogin}</td><td class="${isActive ? 'active' : ''}">${isActive ? '🟢 Activo' : '⚪ Inactivo'}</td>`;
                 tbody.appendChild(row);
             });
         }
 
-        // ==================== GUARDADO DE COLECCIÓN ====================
+        // ==================== NUEVOS BOTONES ====================
+        function marcarTodoDigital() {
+            if (!currentDeck) return alert("Selecciona un mazo primero");
+            const filtered = cards.filter(c => c.deck === currentDeck);
+            filtered.forEach(card => {
+                card.digital = true;
+                card.physical = false; // opcional: desmarcar físico
+            });
+            saveUserData();
+            renderCurrentDeck();
+            alert("✅ Todo marcado como Digital");
+        }
+
+        function marcarTodoFisico() {
+            if (!currentDeck) return alert("Selecciona un mazo primero");
+            const filtered = cards.filter(c => c.deck === currentDeck);
+            filtered.forEach(card => {
+                card.physical = true;
+                card.digital = false; // opcional: desmarcar digital
+            });
+            saveUserData();
+            renderCurrentDeck();
+            alert("✅ Todo marcado como Físico");
+        }
+
+        function desmarcarTodo() {
+            if (!currentDeck) return alert("Selecciona un mazo primero");
+            const filtered = cards.filter(c => c.deck === currentDeck);
+            filtered.forEach(card => {
+                card.physical = false;
+                card.digital = false;
+                card.myDeck = false;
+            });
+            saveUserData();
+            renderCurrentDeck();
+            alert("❌ Todo desmarcado");
+        }
+
+        // ==================== GUARDADO ====================
         function saveUserData() {
             if (!currentUser) return;
             const data = cards.map(c => ({
@@ -243,16 +265,11 @@
             grid.innerHTML = '';
 
             let filtered = currentDeck ? cards.filter(c => c.deck === currentDeck) : cards;
-
-            if (currentView === "mydeck") {
-                filtered = filtered.filter(c => c.myDeck);
-            }
+            if (currentView === "mydeck") filtered = filtered.filter(c => c.myDeck);
 
             filtered.forEach(card => {
                 const div = document.createElement('div');
                 div.className = `card ${(card.physical || card.digital) ? 'owned' : ''}`;
-                div.id = 'card-' + card.name;
-
                 const imageUrl = baseUrl + card.url;
 
                 div.innerHTML = `
@@ -271,7 +288,6 @@
                 `;
                 grid.appendChild(div);
             });
-
             updateProgress();
         }
 
@@ -287,7 +303,6 @@
         function updateProgress() {
             const filtered = currentDeck ? cards.filter(c => c.deck === currentDeck) : cards;
             const total = filtered.length;
-
             const physOwned = filtered.filter(c => c.physical).length;
             const digOwned = filtered.filter(c => c.digital).length;
 
@@ -300,15 +315,8 @@
             document.getElementById('digText').textContent = `${digOwned}/${total} (${digPct}%)`;
         }
 
-        function mostrarMiDeck() {
-            currentView = "mydeck";
-            renderCurrentDeck();
-        }
-
-        function mostrarTodasLasCartas() {
-            currentView = "all";
-            renderCurrentDeck();
-        }
+        function mostrarMiDeck() { currentView = "mydeck"; renderCurrentDeck(); }
+        function mostrarTodasLasCartas() { currentView = "all"; renderCurrentDeck(); }
 
         function createDeckSelector() {
             const decks = [...new Set(cards.map(c => c.deck))].sort();
@@ -323,7 +331,7 @@
 
         function buscarMazoCompleto() {
             if (!currentDeck) return alert("Selecciona un mazo primero");
-            let searchText = currentDeck.trim();
+            const searchText = currentDeck.trim();
             const url = `https://www.cardmarket.com/es/DragonBallSuper/Products/Search?searchMode=v2&idCategory=0&idExpansion=0&searchString=${encodeURIComponent(searchText)}&idRarity=0&perSite=30`;
             window.open(url, '_blank');
         }
@@ -335,7 +343,6 @@
             document.body.appendChild(modal);
         }
 
-        // Contador de visitas
         function incrementarVisitas() {
             let visitas = parseInt(localStorage.getItem('dbTotalVisits') || '0') + 1;
             localStorage.setItem('dbTotalVisits', visitas);
